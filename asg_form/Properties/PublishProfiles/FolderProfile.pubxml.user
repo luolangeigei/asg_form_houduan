@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\luolan_1868170325628.WUYING\source\repos\asg_form\asg_form\bin\Release\net6.0\publish\</_PublishTargetUrl>
+    <History>True|2023-05-06T12:56:00.8507865Z;True|2023-05-02T23:12:11.3956431+08:00;True|2023-05-02T23:00:27.3789943+08:00;True|2023-05-02T22:50:54.3101516+08:00;True|2023-05-02T20:23:39.6920893+08:00;True|2023-05-02T16:53:00.0525495+08:00;True|2023-05-02T00:05:17.4548540+08:00;True|2023-05-01T19:49:40.9420408+08:00;True|2023-05-01T18:53:18.3977777+08:00;True|2023-05-01T15:36:36.6518971+08:00;True|2023-05-01T02:14:53.5219885+08:00;True|2023-04-30T21:39:11.2286790+08:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>
