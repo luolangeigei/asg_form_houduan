@@ -1,11 +1,12 @@
+
 ﻿using Microsoft.AspNetCore.Mvc;
 
 namespace asg_form.Controllers
 {
     public class 查询是否重名 : ControllerBase
     {
-        [Route("api/chongname/")]
-        [HttpPost]
+        [Route("api/v1/Duplicate_name/")]
+        [HttpGet]
         public async Task<ActionResult<string>> Post(string name)
         {
 

@@ -1,7 +1,9 @@
+
 using asg_form;
 using asg_form.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -16,7 +18,30 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "ASG 赛事官网-后端API文档",
+        Version = "V 1.9.6",
+        Description = "这是由罗澜使用ASP.NET.Core开发的ASG赛事组后端系统，包括官网和后台管理系统。使用 sqlserver作为数据库，identity框架进行账号控制。",
+    });
+    var file = Path.Combine(AppContext.BaseDirectory, "asg_form.xml");
+    var path = Path.Combine(AppContext.BaseDirectory, file);
+    c.IncludeXmlComments(path, true);
+    c.OrderActionsBy(o => o.RelativePath);
+});
+
+
+
+
+
+string[] urls = new[] { "https://idvasg.cn", "http://localhost:8080" , "https://admin.idvasg.cn", "https://asgadmin.pages.dev" };
+builder.Services.AddCors(options =>
+options.AddDefaultPolicy(builder => builder.WithOrigins(urls)
+.AllowAnyMethod().AllowAnyHeader().AllowCredentials()));
+
+
 
 IServiceCollection services = builder.Services;
 services.AddDbContext<IDBcontext>(opt =>
@@ -50,6 +75,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//add error 处理器
+builder.Services.Configure<MvcOptions>(options =>
+{
+    options.Filters.Add<MyExceptionFilter>();
+});
+
+
+
 
 services.Configure<JWTOptions>(builder.Configuration.GetSection("JWT"));
 services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -70,23 +103,19 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 
+
 var app = builder.Build();
-
-
-
-
-
+app.UseCors();
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+
 
 app.UseAuthentication();
+
 app.UseAuthorization();
 
-app.UseCors("cors");
 
 app.MapControllers();
 

@@ -11,8 +11,9 @@ namespace asg_form
         public form? haveform { get; set; }
 
         public bool? isbooking { get; set; }
+        public string? chinaname { get; set; }
 
-
+public string? officium { get; set; }
     }
 
     public class Role : IdentityRole<long>
