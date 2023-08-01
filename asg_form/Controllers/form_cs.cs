@@ -7,13 +7,21 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using SixLabors.ImageSharp;
+using System.Net;
+using System.Net.Mail;
+using System.Text;
+using System.Web;
 using static 所有队伍;
 
 namespace asg_form.Controllers
 {
+ 
+      
 
 
-    [ApiController]
+
+
+            [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
@@ -167,7 +175,7 @@ namespace asg_form.Controllers
 
 
                         form form1 = new form();
-                        form1.logo_uri = $"https://124.223.35.239:2333/logo/{for1.team_name}.png";
+                        form1.logo_uri = $"https://124.223.35.239/loge/{for1.team_name}.png";
                         form1.team_name = for1.team_name;
                         form1.team_password = for1.team_password;
                         form1.team_tel = for1.team_tel;
@@ -211,6 +219,36 @@ namespace asg_form.Controllers
             if (base64.Contains(","))
                 base64 = base64.Split(',')[1];
 
+            string token = "24.868552ef96f8a0c04ae26c31e1bd8590.2592000.1693151295.282335-25799235";
+            string host = "https://aip.baidubce.com/rest/2.0/solution/v1/img_censor/v2/user_defined?access_token=" + token;
+            Encoding encoding = Encoding.Default;
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(host);
+            request.Method = "post";
+            request.KeepAlive = true;
+            // 图片的base64编码
+            String str = "image=" + HttpUtility.UrlEncode(base64);
+            byte[] buffer = encoding.GetBytes(str);
+            request.ContentLength = buffer.Length;
+            request.GetRequestStream().Write(buffer, 0, buffer.Length);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.Default);
+            string result = reader.ReadToEnd();
+            if(result.Contains("不合规"))
+            {
+                throw new Exception("图片不合规");
+            }
+            else if(result.Contains("审核失败")) 
+            { 
+                               
+                throw new Exception("图片审核失败");
+            }
+            else
+            {
+                // 疑似或通过
+            }
+            
+
+
             byte[] imageBytes = Convert.FromBase64String(base64);
 
             using (MemoryStream ms = new MemoryStream(imageBytes))
@@ -238,7 +276,7 @@ namespace asg_form.Controllers
         [Route("api/v1/form/all")]
         [HttpGet]
         [Authorize]
-        public List<team> Getform(short page,short page_long)
+        public List<team> Getform(short page,short page_long,string sort)
         {
             TestDbContext ctx = new TestDbContext();
 
@@ -249,7 +287,16 @@ namespace asg_form.Controllers
             {
                 b = c;
             }
-            var forms = ctx.Forms.Include(a => a.role).Skip(page_long * page - page_long).Take(page_long).ToList();
+           List<form> forms;
+            if(sort=="vote")
+            {
+                forms = ctx.Forms.Include(a => a.role).Skip(page_long * page - page_long).Take(page_long).OrderByDescending(a => a.piaoshu).ToList();
+            }
+            else
+            {
+              forms = ctx.Forms.Include(a => a.role).Skip(page_long * page - page_long).Take(page_long).ToList();
+
+            }
             List<team> teams = new List<team>();
 
 
@@ -265,6 +312,22 @@ namespace asg_form.Controllers
             }
             return teams;
         }
+
+
+
+
+
+
+      
+
+
+
+
+
+
+
+
+
 
         /// <summary>
         /// 搜索表单

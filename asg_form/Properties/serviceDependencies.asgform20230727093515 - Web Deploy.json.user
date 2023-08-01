@@ -1,0 +1,34 @@
+{
+  "dependencies": {
+    "apis1": {
+      "restored": true,
+      "restoreTime": "2023-07-27T01:39:30.3435873Z"
+    },
+    "mssql1": {
+      "restored": true,
+      "restoreTime": "2023-07-27T01:56:47.474955Z"
+    }
+  },
+  "parameters": {
+    "mssql1.subscriptionId": {
+      "Name": "mssql1.subscriptionId",
+      "Type": "subscription",
+      "Value": "31f6dccc-fb3a-4902-935e-bfbe283f939c"
+    },
+    "mssql1.resourceGroupName": {
+      "Name": "mssql1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "asgform-app-20230727003745ResourceGroup"
+    },
+    "apis1.resourceGroupName": {
+      "Name": "apis1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "asgform-app-20230727003745ResourceGroup"
+    },
+    "apis1.subscriptionId": {
+      "Name": "apis1.subscriptionId",
+      "Type": "subscription",
+      "Value": "31f6dccc-fb3a-4902-935e-bfbe283f939c"
+    }
+  }
+}

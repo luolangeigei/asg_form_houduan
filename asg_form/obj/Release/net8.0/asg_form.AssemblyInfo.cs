@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("asg_form")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6b66b3cef7f47ef52c67d619ba6f3c561673408d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("asg_form")]
 [assembly: System.Reflection.AssemblyTitleAttribute("asg_form")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

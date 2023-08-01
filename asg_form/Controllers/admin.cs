@@ -55,13 +55,13 @@ namespace asg_form.Controllers
                 foreach (var auser in users)
                 {
                     bool isadmin = await userManager.IsInRoleAsync(auser, "admin");
-                    user.Add(new post_user { id = auser.Id, chinaname = auser.chinaname, name = auser.UserName, isadmin = isadmin, email = auser.Email });
+                    var roles = await userManager.GetRolesAsync(auser);
+ user.Add(new post_user { id = auser.Id, chinaname = auser.chinaname, name = auser.UserName, isadmin = isadmin, email = auser.Email ,Roles= (List<string>)roles });
+
                 }
                 return user;
 
-                return BadRequest(new error_mb { code = 400, message = "此邮件已被使用" });
-
-
+              
             }
             else
             {
@@ -103,6 +103,35 @@ namespace asg_form.Controllers
             }
 
         }
+
+
+        //管理员设置用户的职位
+        [Route("api/v1/admin/setop")]
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult<string>> setrole(string userid,string opname)
+        {
+            string id = this.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var user = await userManager.FindByIdAsync(id);
+
+            bool a = await userManager.IsInRoleAsync(user, "admin");
+            if (a)
+            {
+                var ouser = await userManager.FindByIdAsync(userid);
+
+              ouser.officium = opname;
+                await userManager.UpdateAsync(ouser);
+
+                return "成功！";
+            }
+            else
+            {
+                return BadRequest(new error_mb { code = 400, message = "无权访问" });
+
+            }
+
+        }
+
 
 
         /// <summary>

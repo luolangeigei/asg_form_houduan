@@ -40,7 +40,7 @@ namespace asg_form.Controllers
             builder.Property(e => e.FormName).IsRequired();
             builder.Property(e => e.msg).IsRequired();
             builder.Property(e => e.Title).IsRequired();
-
+            builder.Property(e => e.time).IsRequired();
         }
     }
 
@@ -67,7 +67,7 @@ namespace asg_form.Controllers
             builder.Property(e => e.team2_name).IsRequired();
             builder.Property(e => e.team2_piaoshu).IsRequired();
             builder.Property(e => e.opentime).IsRequired();
-            builder.Property(e => e.closetime).IsRequired();
+         
         }
     }
 
@@ -97,8 +97,7 @@ namespace asg_form.Controllers
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string connstr = @"Server=localhost\SQLEXPRESS
-;Database=master;Trusted_Connection=True;TrustServerCertificate=true";
+            string connstr = @"Server=localhost\SQLEXPRESS;Database=master;Trusted_Connection=True;TrustServerCertificate=true";
             optionsBuilder.UseSqlServer(connstr);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

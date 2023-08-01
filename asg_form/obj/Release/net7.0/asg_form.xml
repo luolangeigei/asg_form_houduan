@@ -228,6 +228,31 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="P:asg_form.Controllers.schedule.team_game.commentary">
+            <summary>
+            解说的名字，用逗号隔开！！！！！！！
+            </summary>
+        </member>
+        <member name="P:asg_form.Controllers.schedule.team_game.referee">
+            <summary>
+            裁判的名字
+            </summary>
+        </member>
+        <member name="P:asg_form.Controllers.schedule.team_game.bilibiliuri">
+            <summary>
+            bilibili录屏路径
+            </summary>
+        </member>
+        <member name="P:asg_form.Controllers.schedule.req_team_game.commentary">
+            <summary>
+            解说的名字，用逗号隔开！！！！！！！
+            </summary>
+        </member>
+        <member name="P:asg_form.Controllers.schedule.req_team_game.referee">
+            <summary>
+            裁判的名字
+            </summary>
+        </member>
         <member name="T:asg_form.Migrations.qq">
             <inheritdoc />
         </member>

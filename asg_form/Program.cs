@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Policy;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 
 
 
@@ -31,7 +32,6 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(path, true);
     c.OrderActionsBy(o => o.RelativePath);
 });
-
 
 
 
@@ -110,6 +110,19 @@ app.UseCors();
 
     app.UseSwagger();
     app.UseSwaggerUI();
+
+app.UseStaticFiles();
+
+//发布时服务器注册静态资源
+string fileUpload = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "loge");
+if (!Directory.Exists(fileUpload))
+{ Directory.CreateDirectory(fileUpload); }
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(fileUpload),
+    RequestPath = "/loge"
+});
+
 
 
 app.UseAuthentication();

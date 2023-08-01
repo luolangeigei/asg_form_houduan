@@ -6,6 +6,7 @@ namespace asg_form
 {
     public class User : IdentityUser<long>
     {
+        public string? UserBase64 { get; set; }
         public DateTime CreationTime { get; set; }
 
         public form? haveform { get; set; }

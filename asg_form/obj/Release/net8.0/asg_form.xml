@@ -105,7 +105,7 @@
             <param name="captoken">谷歌人机验证验证码</param>
             <returns></returns>
         </member>
-        <member name="M:asg_form.Controllers.提交表单.Getform(System.Int16,System.Int16)">
+        <member name="M:asg_form.Controllers.提交表单.Getform(System.Int16,System.Int16,System.String)">
             <summary>
             获得所有表单信息
             </summary>
@@ -146,6 +146,23 @@
             修改中文名称
             </summary>
             <param name="newchinaname">新的中文名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:asg_form.Controllers.login.SendEmail(System.String,System.String,System.String)">
+            <summary>
+            发送邮件
+            </summary>
+            <param name="email">收件人邮箱</param>
+            <param name="title">标题</param>
+            <param name="content">发送内容</param>
+            <returns></returns>
+        </member>
+        <member name="M:asg_form.Controllers.login.getuserbyop(System.String)">
+            <summary>
+            根据职位获取用户
+            </summary>
+            <param name="req">用户信息</param>
+            <param name="jwtOptions"></param>
             <returns></returns>
         </member>
         <member name="M:asg_form.Controllers.login.login1(asg_form.LoginRequest,Microsoft.Extensions.Options.IOptions{asg_form.JWTOptions})">
@@ -225,6 +242,51 @@
         <member name="M:asg_form.Controllers.schedule.mylog">
             <summary>
             获取我的竞猜
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:asg_form.Controllers.schedule.team_game.commentary">
+            <summary>
+            解说的名字，用逗号隔开！！！！！！！
+            </summary>
+        </member>
+        <member name="P:asg_form.Controllers.schedule.team_game.referee">
+            <summary>
+            裁判的名字
+            </summary>
+        </member>
+        <member name="P:asg_form.Controllers.schedule.team_game.bilibiliuri">
+            <summary>
+            bilibili录屏路径
+            </summary>
+        </member>
+        <member name="P:asg_form.Controllers.schedule.req_team_game.commentary">
+            <summary>
+            解说的名字，用逗号隔开！！！！！！！
+            </summary>
+        </member>
+        <member name="P:asg_form.Controllers.schedule.req_team_game.referee">
+            <summary>
+            裁判的名字
+            </summary>
+        </member>
+        <member name="M:asg_form.Controllers.user_form.Addform(System.String,System.String)">
+            <summary>
+            绑定表单
+            </summary>
+            <param name="formname">表单名称</param>
+            <param name="formpassword">表单密码</param>
+            <returns></returns>
+        </member>
+        <member name="M:asg_form.Controllers.user_form.getmyform">
+            <summary>
+            获取我的表单
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:asg_form.Controllers.user_form.putmyform(asg_form.Controllers.form_get)">
+            <summary>
+            修改我的表单
             </summary>
             <returns></returns>
         </member>
@@ -322,6 +384,30 @@
             <inheritdoc />
         </member>
         <member name="M:asg_form.Migrations.base64.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:asg_form.Migrations.newstime">
+            <inheritdoc />
+        </member>
+        <member name="M:asg_form.Migrations.newstime.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:asg_form.Migrations.newstime.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:asg_form.Migrations.newstime.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:asg_form.Migrations.userbase">
+            <inheritdoc />
+        </member>
+        <member name="M:asg_form.Migrations.userbase.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:asg_form.Migrations.userbase.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:asg_form.Migrations.userbase.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>

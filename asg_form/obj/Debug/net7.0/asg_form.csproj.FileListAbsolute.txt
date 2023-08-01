@@ -113,3 +113,4 @@ C:\Users\luolan_1868170325628.WUYING\source\repos\asg_form\asg_form\obj\Debug\ne
 C:\Users\luolan_1868170325628.WUYING\source\repos\asg_form\asg_form\obj\Debug\net7.0\asg_form.pdb
 C:\Users\luolan_1868170325628.WUYING\source\repos\asg_form\asg_form\obj\Debug\net7.0\asg_form.genruntimeconfig.cache
 C:\Users\luolan_1868170325628.WUYING\source\repos\asg_form\asg_form\obj\Debug\net7.0\ref\asg_form.dll
+C:\Users\luolan_1868170325628.WUYING\source\repos\asg_form\asg_form\obj\Debug\net7.0\asg_form.sourcelink.json

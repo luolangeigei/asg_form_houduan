@@ -38,7 +38,15 @@ namespace asg_form.Controllers
             if (a)
             {
                 TestDbContext testDb = new TestDbContext();
-                testDb.team_Games.Add(new team_game { team1_name = req.team1_name, team2_name = req.team2_name, opentime = req.opentime, closetime = req.closetime, team1_piaoshu = 0, team2_piaoshu = 0 });
+                testDb.team_Games.Add(new team_game { 
+                    team1_name = req.team1_name,
+                    team2_name = req.team2_name,
+                    opentime = req.opentime,
+                     team1_piaoshu = 0, 
+                    team2_piaoshu = 0 ,
+                commentary=req.commentary,
+                referee=req.referee,
+                });
                 await testDb.SaveChangesAsync();
                 return "ok";
             }
@@ -146,12 +154,12 @@ namespace asg_form.Controllers
                 if (teamid == 1)
                 {
                     team.team1_piaoshu++;
-                    team.logs.Add(new schedule_log { userid= id ,chickteam=team.team1_name,team=team});
+                    team.logs.Add(new schedule_log { userid= id ,chickteam=team.team1_name,team=team,win= null });
                 }
                 else if(teamid == 2)
                 {
                     team.team2_piaoshu++;
-                    team.logs.Add(new schedule_log { userid = id, chickteam = team.team2_name, team = team });
+                    team.logs.Add(new schedule_log { userid = id, chickteam = team.team2_name, team = team,win=null });
 
                 }
                 else
@@ -210,7 +218,7 @@ namespace asg_form.Controllers
             public string userid { get; set; }
             public team_game team { get; set; }
             public string chickteam { get; set; }
-            public bool win { get; set; }
+            public bool? win { get; set; }
         }
 
 
@@ -223,8 +231,19 @@ namespace asg_form.Controllers
             public string team2_name { get; set; }
             public int team2_piaoshu { get; set; }
             public DateTime opentime { get; set; }
-
-            public DateTime closetime { get; set; }
+            /// <summary>
+            /// 解说的名字，用逗号隔开！！！！！！！
+            /// </summary>
+            public string commentary { get; set; }
+            /// <summary>
+            /// 裁判的名字
+            /// </summary>
+            public string referee { get; set; }
+            /// <summary>
+            /// bilibili录屏路径
+            /// </summary>
+            public Uri? bilibiliuri { get; set; }
+         public string winteam { get; set; }
             public List<schedule_log> logs { get; set; } = new List<schedule_log>();
 
         }
@@ -237,8 +256,16 @@ namespace asg_form.Controllers
             public string team2_name { get; set; }
             public DateTime opentime { get; set; }
 
-            public DateTime closetime { get; set; }
-           
+            /// <summary>
+            /// 解说的名字，用逗号隔开！！！！！！！
+            /// </summary>
+            public string commentary { get; set; }
+            /// <summary>
+            /// 裁判的名字
+            /// </summary>
+            public string referee { get; set; }
+
+
         }
 
 
