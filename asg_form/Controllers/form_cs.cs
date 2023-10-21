@@ -1,27 +1,30 @@
 
+using asg_form.Controllers.Hubs;
 using Manganese.Text;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
+using NLog;
+using NPOI.OpenXmlFormats.Spreadsheet;
 using RestSharp;
 using SixLabors.ImageSharp;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Web;
+using static asg_form.Controllers.excel;
 using static 所有队伍;
 
 namespace asg_form.Controllers
 {
- 
-      
 
 
 
 
-            [ApiController]
+    [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
@@ -103,6 +106,7 @@ namespace asg_form.Controllers
             public int Number { get; set; }
         }
 
+      
         /// <summary>
         /// 修改问卷
         /// </summary>
@@ -118,10 +122,7 @@ namespace asg_form.Controllers
             var form = ctx.Forms.Include(a => a.role).FirstOrDefault(a => a.team_name==formname);
             if (form.team_password == password)
             {
-                form.team_name = for1.team_name;
-            form.team_password = for1.team_password;
-            form.team_tel = for1.team_tel;
-
+              
             List<role> role = new List<role>();
             foreach (role_get a in for1.role_get)
             {
@@ -129,8 +130,8 @@ namespace asg_form.Controllers
             }
             form.role = role;
 
-
             await ctx.SaveChangesAsync();
+               
             return Ok("成功！");
         }
             else
@@ -138,6 +139,20 @@ namespace asg_form.Controllers
                 return BadRequest(new error_mb { code=400,message="密码错误"});
     }
 }
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly IHubContext<room>? hubContext;
+        
+
+
+        [Route("api/v1/websocket/")]
+        [HttpGet]
+        public async  Task  GetAsync()
+        {
+         await hubContext.Clients.All.SendAsync("formok", $"测试，ok");
+
+
+        }
+
 
         /// <summary>
         /// 提交表单
@@ -163,23 +178,22 @@ namespace asg_form.Controllers
                 {
          
                     TestDbContext ctx = new TestDbContext();
-                    if (ctx.Forms.Any(e => e.team_name == for1.team_name))
+                    if (ctx.Forms.Include(a=>a.events).Where(a=>a.events.name==for1.events_name).Any(e => e.team_name == for1.team_name))
                     {
                     return BadRequest(new error_mb { code = 400, message = "有重名队伍" });
-
                 }
                 else
                     {
-                        base64toimg(for1.logo_base64, $@"{AppDomain.CurrentDomain.BaseDirectory}loge\{for1.team_name}.png");
-
+                        base64toimg(for1.logo_base64, $@"{AppDomain.CurrentDomain.BaseDirectory}loge\{for1.events_name}\{for1.team_name}.png");
+                  var events= await ctx.events.FirstAsync(ctx => ctx.name == for1.events_name);
 
 
                         form form1 = new form();
-                        form1.logo_uri = $"https://124.223.35.239/loge/{for1.team_name}.png";
+                        form1.logo_uri = $"https://124.223.35.239/loge/{for1.events_name}/{for1.team_name}.png";
                         form1.team_name = for1.team_name;
                         form1.team_password = for1.team_password;
                         form1.team_tel = for1.team_tel;
-                        
+                        form1.events = events;
                         List<role> role = new List<role>();
                         foreach (role_get a in for1.role_get)
                         {
@@ -191,8 +205,18 @@ namespace asg_form.Controllers
                         await ctx.SaveChangesAsync();
                     int nownumber = ctx.Forms.Count();
                     //ChatRoomHub chat = new ChatRoomHub();
-                  // await chat.formok(nownumber, for1.team_name);
+                    // await chat.formok(nownumber, for1.team_name);
+                    try
+                    {
+                        await hubContext.Clients.All.SendAsync("formok", $"队伍{for1.team_name}已经成功报名，剩余队伍名额：{ctx.Forms.Count()}/32");
 
+                    }
+                    catch
+                    {
+
+
+                    }
+                    logger.Info($"有新队伍报名！队伍名称：{for1.team_name} ");
                     }
 
 
@@ -219,36 +243,6 @@ namespace asg_form.Controllers
             if (base64.Contains(","))
                 base64 = base64.Split(',')[1];
 
-            string token = "24.868552ef96f8a0c04ae26c31e1bd8590.2592000.1693151295.282335-25799235";
-            string host = "https://aip.baidubce.com/rest/2.0/solution/v1/img_censor/v2/user_defined?access_token=" + token;
-            Encoding encoding = Encoding.Default;
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(host);
-            request.Method = "post";
-            request.KeepAlive = true;
-            // 图片的base64编码
-            String str = "image=" + HttpUtility.UrlEncode(base64);
-            byte[] buffer = encoding.GetBytes(str);
-            request.ContentLength = buffer.Length;
-            request.GetRequestStream().Write(buffer, 0, buffer.Length);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.Default);
-            string result = reader.ReadToEnd();
-            if(result.Contains("不合规"))
-            {
-                throw new Exception("图片不合规");
-            }
-            else if(result.Contains("审核失败")) 
-            { 
-                               
-                throw new Exception("图片审核失败");
-            }
-            else
-            {
-                // 疑似或通过
-            }
-            
-
-
             byte[] imageBytes = Convert.FromBase64String(base64);
 
             using (MemoryStream ms = new MemoryStream(imageBytes))
@@ -273,10 +267,11 @@ namespace asg_form.Controllers
         /// <param name="page">页数</param>
         /// <param name="page_long">每页长度</param>
         /// <returns></returns>
+     
         [Route("api/v1/form/all")]
         [HttpGet]
         [Authorize]
-        public List<team> Getform(short page,short page_long,string sort)
+        public List<team> Getform(short page,short page_long,string sort,string eventsname)
         {
             TestDbContext ctx = new TestDbContext();
 
@@ -287,14 +282,17 @@ namespace asg_form.Controllers
             {
                 b = c;
             }
+          var events=  ctx.events.First(ctx => ctx.name == eventsname);
            List<form> forms;
             if(sort=="vote")
             {
-                forms = ctx.Forms.Include(a => a.role).Skip(page_long * page - page_long).Take(page_long).OrderByDescending(a => a.piaoshu).ToList();
+                forms = ctx.Forms.Include(a => a.role).Include(a=>a.events).OrderByDescending(a => a.piaoshu).Where(a=>a.events==events).Skip(page_long * page - page_long).Take(page_long).ToList();
             }
             else
             {
-              forms = ctx.Forms.Include(a => a.role).Skip(page_long * page - page_long).Take(page_long).ToList();
+                //改为按照id倒序排序
+              //forms = ctx.Forms.Include(a => a.role).Skip(page_long * page - page_long).Take(page_long).ToList();
+              forms = ctx.Forms.Include(a => a.role).Include(a => a.events).OrderByDescending(a => a.Id).Where(a => a.events == events).Skip(page_long * page - page_long).Take(page_long).ToList();
 
             }
             List<team> teams = new List<team>();
@@ -318,7 +316,6 @@ namespace asg_form.Controllers
 
 
 
-      
 
 
 
@@ -329,26 +326,51 @@ namespace asg_form.Controllers
 
 
 
-        /// <summary>
-        /// 搜索表单
-        /// </summary>
-        /// <param name="team_name">表单名称</param>
-        /// <returns></returns>
-        [Route("api/v1/form/{team_name}")]
+            /// <summary>
+            /// 搜索表单
+            /// </summary>
+            /// <param name="team_name">表单名称</param>
+            /// <returns></returns>
+            [Route("api/v1/form/{team_name}")]
         [HttpGet]
-        public async Task<ActionResult<form>> formsearch(string team_name)
+        public async Task<ActionResult<List<allteam>>> formsearch(string team_name)
         {
-            using TestDbContext ctx = new TestDbContext();
-            var form = ctx.Forms.Include(a=>a.role).Single(b => b.team_name == team_name);
-            
-                return form;
+            TestDbContext ctx = new TestDbContext();
+            List<allteam> data = new List<allteam>();
+            List<form> teams = ctx.Forms.Include(a => a.role).Where(a => a.team_name.IndexOf(team_name) >= 0).ToList();
+            foreach (var team in teams)
+            {
+                var roles = team.role;
+                allteam allteam = new allteam();
+                allteam.Id = team.Id;
+                allteam.Name = team.team_name;
+                foreach (var role in roles)
+                {
+                    role.form = null;
+                    allteam.role.Add(role);
+                }
+                data.Add(allteam);
+            }
+            return data;
 
 
         }
-
+        /// <summary>
+        /// 模糊搜索表单名称
+        /// </summary>
+        /// <param name="team_name">表单名称</param>
+        /// <returns></returns>
+        [Route("api/v1/form/name/{team_name}")]
+        [HttpGet]
+        public async Task<ActionResult<List<string>>> search_name(string team_name,string events_name)
+        {
+            var ctx = new TestDbContext();
+            var data = ctx.Forms.Where(a => a.team_name.IndexOf(team_name) >= 0&&a.events.name==events_name).Select(a => a.team_name).ToList();
+            return data;
+        }
 
     }
-
+  
 
 
     public class role
@@ -377,6 +399,8 @@ namespace asg_form.Controllers
         public string team_password { get; set; }
         public string team_tel { get; set; }
         public string logo_uri { get; set; }
+        public Events.T_events events { get; set; }
+      //  public string? belong { get; set; }
         public List<role> role { get; set; } = new List<role>();
     }
 
@@ -388,6 +412,8 @@ namespace asg_form.Controllers
         public string team_password { get; set; }
         public string team_tel { get; set; }
         public string logo_base64 { get; set; }
+        public string events_name { get; set; }
+      //  public string? belong { get; set; }
         public List<role_get> role_get { get; set; }
     }
 

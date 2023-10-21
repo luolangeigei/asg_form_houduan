@@ -60,7 +60,7 @@ namespace asg_form.Controllers
            
 
             TestDbContext test =new TestDbContext();
-            return test.news.ToList();
+            return test.news.OrderByDescending(a => a.Id).ToList();
 
         }
 

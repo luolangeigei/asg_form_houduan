@@ -6,8 +6,10 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "asg_form", "asg_form\asg_form.csproj", "{6BBCCC2C-1B0A-4456-B9E5-B0EF2B156D8B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F6A1B401-7C29-4CA7-81B6-2F2CDE29E922}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{B5E46494-AFBC-4A84-80BA-9F409701E655}"
 	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
+		main.md = main.md
 	EndProjectSection
 EndProject
 Global

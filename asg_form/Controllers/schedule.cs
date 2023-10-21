@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using static asg_form.blog;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using NPOI.OpenXmlFormats.Spreadsheet;
+using Castle.Components.DictionaryAdapter;
 
 namespace asg_form.Controllers
 {
@@ -19,6 +21,43 @@ namespace asg_form.Controllers
             this.roleManager = roleManager;
             this.userManager = userManager;
         }
+
+        [Authorize]
+        [Route("api/v1/admin/game")]
+        [HttpPut]
+        public async Task<ActionResult<string>> gameput(long gameid,[FromBody] req_team_game req)
+        {
+
+            string id = this.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var user = await userManager.FindByIdAsync(id);
+
+            bool a = await userManager.IsInRoleAsync(user, "admin");
+            if (a)
+            {
+                TestDbContext testDb = new TestDbContext();
+
+                var game = await testDb.team_Games.FirstOrDefaultAsync(a => a.id == gameid);
+                game.team1_name = req.team1_name;
+                game.team2_name = req.team2_name;
+                game.opentime = req.opentime;
+                game.commentary = req.commentary;
+                game.bilibiliuri = req.bilibiliuri;
+                game.referee = req.referee;
+                game.belong = req.belong;
+                await testDb.SaveChangesAsync();
+                return "ok";
+             
+
+
+            }
+            return BadRequest(new error_mb { code = 400, message = "无权访问" });
+
+        }
+
+
+
+
+
 
         /// <summary>
         /// 发布一个竞猜比赛
@@ -46,6 +85,7 @@ namespace asg_form.Controllers
                     team2_piaoshu = 0 ,
                 commentary=req.commentary,
                 referee=req.referee,
+                belong=req.belong,
                 });
                 await testDb.SaveChangesAsync();
                 return "ok";
@@ -79,11 +119,15 @@ namespace asg_form.Controllers
             {
                 TestDbContext testDb = new TestDbContext();
                 team_game game=testDb.team_Games.Include(a=>a.logs).First(a=>a.id==teamid);
+                game.winteam = winteam;
                foreach(var log in game.logs)
                 {
                     if (log.chickteam == winteam)
                     {
                         log.win = true;
+                    }else
+                    {
+                        log.win = false;
                     }
                 }
                 await testDb.SaveChangesAsync();
@@ -178,13 +222,29 @@ namespace asg_form.Controllers
         /// <returns></returns>
         [Route("api/v1/game/")]
         [HttpGet]
-        public async Task<ActionResult<List<team_game>>> gameall()
+        public async Task<ActionResult<List<team_game>>> gameall(int page,int page_long,string belong="all")
         {
            
             TestDbContext test = new TestDbContext();
 
-            var team = test.team_Games.OrderByDescending(a=>a.opentime).ToList();
-   
+            int c = test.Forms.Count();
+            int b = page_long * page;
+            if (page_long * page > c)
+            {
+                b = c;
+            }
+            List<team_game> team = new List<team_game>();
+            if(belong=="all")
+                {
+              team = test.team_Games.OrderByDescending(a => a.opentime).Skip(page_long * page - page_long).Take(page_long).ToList();
+
+            }
+            else
+            {
+              team = test.team_Games.Where(a => a.belong == belong).OrderByDescending(a => a.opentime).Skip(page_long * page - page_long).Take(page_long).ToList();
+
+            }
+
             return team;
 
         }
@@ -201,8 +261,11 @@ namespace asg_form.Controllers
             string id = this.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
             TestDbContext test = new TestDbContext();
-            var team = test.schlogs.Where(a=>a.userid==id).ToList();
-
+            var team = test.schlogs.Include(a=>a.team).Where(a=>a.userid==id).ToList();
+            foreach(var team_game in team)
+            {
+                team_game.team.logs = null;
+            }
             return team;
 
 
@@ -243,7 +306,8 @@ namespace asg_form.Controllers
             /// bilibili录屏路径
             /// </summary>
             public Uri? bilibiliuri { get; set; }
-         public string winteam { get; set; }
+         public string? winteam { get; set; }
+            public string? belong { get; set; }
             public List<schedule_log> logs { get; set; } = new List<schedule_log>();
 
         }
@@ -264,7 +328,8 @@ namespace asg_form.Controllers
             /// 裁判的名字
             /// </summary>
             public string referee { get; set; }
-
+            public string? belong { get; set; }
+            public Uri? bilibiliuri { get; set;}
 
         }
 
